@@ -7,3 +7,5 @@
 Infuse 图片来自官方当前文章 https://support.firecore.com/hc/en-us/articles/360006462093-Streaming-from-Plex-Emby-and-Jellyfin ，文章更新时间为 2026-11-10T02:31:04Z，2026-11-16 获取并转换 WebP。文章更新时间不等于截图拍摄日期，不主张是最新 App 实机截图。
 
 商标、界面及原截图权利归各自权利人；不包含在本站原创内容 CC BY 4.0 或代码 MIT 授权内。旧版社区图片移至 archive/screenshots-v1，不对外部署。
+
+- vidhub-setup.webp：来自 https://wiki.freeembyguide.eu.org/use/vidhub/vidhub-2.png ，2026-11-16 获取。旧版 macOS 配置截图，保留原图注释并转为 WebP；非当前版本实机截图。来源教程 https://wiki.freeembyguide.eu.org/docs/use/vidhub.html ，页面已明确标注版本范围。
