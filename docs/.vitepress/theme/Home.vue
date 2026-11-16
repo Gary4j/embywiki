@@ -1,18 +1,49 @@
 <script setup>
-const paths = [
- {n:'01',tag:'QUICK START',title:'第一次使用 Emby',desc:'准备连接信息，添加服务器，开始播放第一部影片。',href:'/guide/start',meta:'约 5 分钟 · 新手必读'},
- {n:'02',tag:'YOUR DEVICES',title:'选一个顺手的客户端',desc:'手机、电脑还是电视？按设备找到适合自己的选择。',href:'/clients/choose',meta:'平台对照 · 官方下载'},
- {n:'03',tag:'BETTER PLAYBACK',title:'让播放更顺畅',desc:'读懂直放与转码，调好字幕、音轨和网络线路。',href:'/playback/methods',meta:'播放原理 · 实用设置'}
-]
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useData } from 'vitepress'
+import { parseDelivery } from './delivery.mjs'
+const { page } = useData()
+const input = ref(''), result = ref(null), attempted = ref(false), showPassword = ref(false), status = ref('')
+const sample = '观影地址：https://media.example.com:443\n续费地址：https://emby.gary4j.fun/\n账号：你的账号\n密码：你的密码\n到期：2026-12-31'
+const example = {server:{url:'https://media.example.com:443',host:'media.example.com',base:'https://media.example.com',port:'443',https:true},username:'你的账号',password:'你的密码',expiry:'',renewal:null}
+const current = computed(()=>result.value?.ok?result.value:example)
+const ready = computed(()=>!!result.value?.ok)
+function parse() { attempted.value=true;showPassword.value=false;result.value=parseDelivery(input.value);status.value='';if(result.value.ok)input.value='' }
+function clear() { input.value='';result.value=null;attempted.value=false;showPassword.value=false;status.value='' }
+async function copy(value) {try {await navigator.clipboard.writeText(value);status.value='已复制。'}catch{status.value='复制失败，请手动选择对应字段复制。'}}
+onMounted(()=>window.addEventListener('pagehide',clear))
+onBeforeUnmount(()=>window.removeEventListener('pagehide',clear))
 </script>
 <template>
-<div class="wiki-home">
- <section class="hero">
-  <div class="hero-copy"><div class="eyebrow"><span></span> THE EMBY FIELD GUIDE / 中文指南</div><h1>少一点折腾，<br>多一点<span class="accent">好好看。</span></h1><p class="hero-description">从第一次连接，到每一次顺畅播放。<br>把 Emby 的账号、客户端和播放问题，一次讲清楚。</p><div class="hero-actions"><a class="primary" href="/guide/start">开始使用 <span>↗</span></a><a class="secondary" href="/help/troubleshooting">遇到问题？从这里排查 →</a></div><div class="hero-note">无需从头读完。找到你现在需要的那一页。</div></div>
-  <div class="field-card" aria-label="连接、浏览、播放三个步骤"><div class="card-top"><span>PLAYBACK NOTES</span><span>VOL. 01</span></div><div class="orbital"><span class="orbit o1"></span><span class="orbit o2"></span><span class="orbit o3"></span><div class="play-symbol">▶</div><span class="orbit-dot"></span></div><div class="card-caption">你的媒体。你的节奏。</div><div class="signal"><span>01 连接</span><i></i><span>02 浏览</span><i></i><span>03 播放</span></div><div class="card-bottom"><span>SERVER → CLIENT → SCREEN</span><span class="signal-light">● READY</span></div></div>
- </section>
- <section class="paths"><div class="section-heading"><h2>从你所在的这一步开始</h2><span>三条阅读路径 / GET STARTED</span></div><div class="path-grid"><a v-for="item in paths" :key="item.n" :href="item.href" class="path"><div class="path-top"><span>{{item.n}}</span><small>{{item.tag}}</small><span>↗</span></div><h3>{{item.title}}</h3><p>{{item.desc}}</p><div class="path-meta">{{item.meta}}</div></a></div></section>
- <section class="quick-help"><div><div class="eyebrow">TROUBLESHOOTING</div><h2>问题有很多，<br>排查可以很简单。</h2><p>从看到的现象出发，每次只改一个变量。</p></div><div class="help-links"><a href="/help/troubleshooting#无法连接服务器"><span><b>01</b> 无法连接服务器</span><span>→</span></a><a href="/help/troubleshooting#能看到海报但无法播放"><span><b>02</b> 能看海报，却播不了视频</span><span>→</span></a><a href="/help/troubleshooting#播放卡顿或频繁缓冲"><span><b>03</b> 播放卡顿、反复缓冲</span><span>→</span></a><a href="/help/troubleshooting#没有字幕或没有声音"><span><b>04</b> 字幕和声音不对劲</span><span>→</span></a></div></section>
- <section class="editor-note"><span class="note-label">编者的话</span><p>Emby 是媒体管理与播放工具。一个客户端、一组有效的服务器连接信息，就是起点。这本指南整理使用方法，也解释背后的原因，让下一次遇到问题时，你能自己找到答案。</p><a href="/about">了解资料来源与维护原则 ↗</a></section>
-</div>
+ <div v-if="page.isNotFound" class="guide"><h1>没有找到这一页</h1><p><a href="/">返回 Emby 使用指南</a></p></div>
+ <div v-else class="guide">
+  <header><h1>Emby 使用指南</h1><p class="intro">拿到账号后，按下面的步骤连接，就可以开始观影。</p>
+   <nav aria-label="页内导航"><a href="#about">什么是 Emby</a><a href="#setup">填写信息</a><a href="#clients">推荐客户端</a><a href="#emby">Emby 配置</a><a href="#infuse">Infuse 配置</a></nav>
+  </header>
+  <main>
+   <section id="about"><h2>1. 什么是 Emby？</h2><p>Emby 是一个媒体库播放器。它本身不提供影片，你需要用客户端连接到已开通的服务器，登录后浏览和播放内容。</p><p>交付信息里的<strong>观影地址</strong>用于连接播放器；<strong>续费地址</strong>用于续费和管理服务，不能填到播放器的服务器地址里。账号和密码使用交付给你的那一组，通常<strong>不需要注册 Emby Connect</strong>。</p></section>
+   <section id="setup"><h2>2. 粘贴你的交付信息</h2><p>把收到的整段信息粘贴到下面，生成各客户端的填写内容。也可以跳过，直接对照后面的示例操作。</p>
+    <label for="delivery">交付信息</label><textarea id="delivery" v-model="input" :placeholder="sample" rows="6" autocomplete="off" autocapitalize="off" :spellcheck="false" maxlength="6000"></textarea>
+    <div class="actions"><button class="primary" @click="parse" :disabled="!input.trim()">生成填写说明</button><button @click="clear" :disabled="!input && !attempted">清空信息</button></div>
+    <p class="small">仅在当前浏览器内处理，不上传、不保存。解析成功后原文会清空；离开页面或刷新后需要重新粘贴。</p>
+    <ul v-if="attempted && !result?.ok" role="alert" class="errors"><li v-for="issue in result?.issues" :key="issue">{{issue}}</li></ul>
+    <div v-if="ready" class="parsed" aria-live="polite"><p><strong>已识别，下面的配置表已换成你的信息。</strong></p><dl><dt>观影地址</dt><dd>{{current.server.url}} <button class="copy" @click="copy(current.server.url)">复制地址</button></dd><dt>账号</dt><dd>{{current.username}} <button class="copy" @click="copy(current.username)">复制账号</button></dd><dt>密码</dt><dd><span class="credential">{{showPassword?current.password:'••••••••'}}</span> <button class="copy" @click="showPassword=!showPassword" :aria-pressed="showPassword">{{showPassword?'隐藏':'显示'}}</button> <button class="copy" @click="copy(current.password)">复制密码</button></dd><template v-if="current.expiry"><dt>到期日期</dt><dd>{{current.expiry}}（以服务方记录为准）</dd></template><template v-if="current.renewal"><dt>续费地址</dt><dd><a :href="current.renewal.url" target="_blank" rel="noopener noreferrer">{{current.renewal.url}}</a></dd></template></dl><p class="small">这里只整理填写内容，不会连接服务器验证账号。</p></div>
+    <p class="status" role="status">{{status}}</p>
+   </section>
+   <section id="clients"><h2>3. 推荐用哪个客户端？</h2><div class="table-wrap"><table><thead><tr><th>你的设备</th><th>建议使用</th><th>下载</th><th>怎么配置</th></tr></thead><tbody><tr><td>安卓手机、平板、安卓电视</td><td>Emby 官方客户端</td><td><a href="https://emby.media/download.html" target="_blank" rel="noopener noreferrer">官网下载</a></td><td><a href="#emby">Emby 配置 ↓</a></td></tr><tr><td>Windows / Linux 电脑</td><td>Emby 官方客户端</td><td><a href="https://emby.media/download.html" target="_blank" rel="noopener noreferrer">官网下载</a></td><td><a href="#emby">Emby 配置 ↓</a></td></tr><tr><td>iPhone、iPad、Mac、Apple TV</td><td>Infuse；也可用 Emby</td><td><a href="https://firecore.com/infuse" target="_blank" rel="noopener noreferrer">Infuse 官网</a> · <a href="https://emby.media/download.html" target="_blank" rel="noopener noreferrer">Emby 官网</a></td><td><a href="#infuse">Infuse 配置 ↓</a></td></tr><tr><td>暂时不想安装应用</td><td>浏览器（服务器支持时）</td><td>打开交付的观影地址</td><td><a href="#web">网页使用 ↓</a></td></tr></tbody></table></div><p class="small">购买服务器服务不一定包含客户端解锁。Emby 部分平台的完整播放、Infuse 的部分功能可能需要单独付费，以当前应用提示为准。电视请选择对应的电视版本。</p></section>
+   <section id="emby"><h2>4. Emby 客户端怎么填？</h2><ol><li>打开 Emby，进入初始化向导；遇到 Emby Connect 时，选择<strong>跳过 / 手动连接</strong>。</li><li>在“连接到服务器”页填写主机地址和端口，然后点<strong>连接</strong>。</li><li>在登录页填写交付的<strong>账号、密码</strong>，点登录。</li></ol>
+    <p class="notice">{{ready?'以下是你的实际填写内容。':'以下是格式示例。粘贴上面的交付信息后，会自动替换为你的内容。'}}</p>
+    <table class="config"><tbody><tr><th scope="row">主机地址</th><td><code>{{current.server.base}}</code><button v-if="ready" class="copy" @click="copy(current.server.base)">复制</button><small>保留 http:// 或 https://，端口填下一行。</small></td></tr><tr><th scope="row">端口</th><td><code>{{current.server.port}}</code><button v-if="ready" class="copy" @click="copy(current.server.port)">复制</button></td></tr><tr><th scope="row">用户名</th><td>{{current.username}}</td></tr><tr><th scope="row">密码</th><td>{{ready?(showPassword?current.password:'••••••••'):'交付给你的密码'}}</td></tr></tbody></table>
+    <p>如果客户端只有一个“服务器 URL”输入框，就填写完整观影地址 <code>{{current.server.url}}</code>。如果另有 HTTPS 开关，则按地址的协议设置。</p>
+    <figure class="infuse-shot"><a href="/screenshots/emby-current-server.webp" target="_blank" rel="noopener"><img src="/screenshots/emby-current-server.webp" width="780" height="355" alt="Emby Web 26.0.43 实际连接页：主机填写带协议的地址，端口单独填写" loading="lazy"></a><figcaption>主机保留 https://，端口单独填写 443。图中为虚拟示例地址，点击可放大。</figcaption></figure>
+    <p class="source">截图来自 <a href="https://app.emby.media/" target="_blank" rel="noopener noreferrer">Emby 官方 Web 客户端</a> 26.0.43（2026-11-16 实际截取）。手机、电视和桌面 App 的外观可能不同，字段按上表对应填写。连接成功后，再填写交付的账号和密码。</p>
+   </section>
+   <section id="infuse"><h2>5. Infuse 怎么填？</h2><ol><li>iPhone / iPad / Mac：打开 Infuse，进入<strong>设置（齿轮）→ 添加文件（Add Files）→ 添加媒体服务器（Add Media Server）</strong>。Apple TV：设置 → 共享（Shares）→ 添加媒体服务器。</li><li>选择<strong>其它 Emby（Other Emby）</strong>。交付的是服务器本地账号，不选上方在线账号中的“Connect to Emby”。</li><li>填写下面的信息，展开<strong>高级</strong>设置端口和 HTTPS，再点添加。</li></ol>
+    <table class="config"><tbody><tr><th scope="row">名称</th><td>我的 Emby（任意填写，方便识别）</td></tr><tr><th scope="row">地址</th><td><code>{{current.server.host}}</code><button v-if="ready" class="copy" @click="copy(current.server.host)">复制</button><small>只填主机，不带 http://、https:// 或端口。</small></td></tr><tr><th scope="row">用户名</th><td>{{current.username}}</td></tr><tr><th scope="row">密码</th><td>{{ready?(showPassword?current.password:'••••••••'):'交付给你的密码'}}</td></tr><tr><th scope="row">端口（高级）</th><td><code>{{current.server.port}}</code></td></tr><tr><th scope="row">HTTPS（高级）</th><td><strong>{{current.server.https?'开启':'关闭'}}</strong>，与观影地址的协议一致。</td></tr></tbody></table>
+    <div class="infuse-screens"><figure><a href="/screenshots/infuse-media-servers.webp" target="_blank" rel="noopener"><img src="/screenshots/infuse-media-servers.webp" width="1125" height="732" alt="Infuse 官方教程：在 Media Servers 区域选择 Add Media Server" loading="lazy"></a><figcaption>① 在媒体服务器区域点 Add Media Server。</figcaption></figure><figure><a href="/screenshots/infuse-other-emby.webp" target="_blank" rel="noopener"><img src="/screenshots/infuse-other-emby.webp" width="1125" height="1059" alt="Infuse 官方教程：在 Available Servers 中选择 Other Emby" loading="lazy"></a><figcaption>② 选择下方 Other Emby，再按上表填写。</figcaption></figure></div><p class="source">图片来自 <a href="https://support.firecore.com/hc/en-us/articles/360006462093-Streaming-from-Plex-Emby-and-Jellyfin" target="_blank" rel="noopener noreferrer">Infuse 官方当前教程</a>（文档更新于 2026-11-10），不是生成的界面图。不同系统和版本的文字可能略有差异。默认可使用直接模式（Direct Mode），媒体库模式按需要或服务方要求选择。</p>
+   </section>
+   <section id="web"><h2>6. 网页观影与续费</h2><p><strong>网页观影：</strong>如果服务器提供网页端，在浏览器打开交付的观影地址，使用同一组账号密码登录。网页的格式兼容性可能不如客户端。</p><p><strong>续费：</strong>打开交付信息中的续费地址。当前服务续费入口为 <a href="https://emby.gary4j.fun/" target="_blank" rel="noopener noreferrer">emby.gary4j.fun</a>。到期时间用于提醒续费，不需要填写到客户端中。</p><p><strong>连接不上：</strong>先检查观影地址、端口、HTTPS 和账号密码有没有填反或多出空格。能看到海报但不能播放时，试试换一部影片或关闭字幕；仍失败就把设备型号、客户端名称和报错截图发给服务方，截图记得遮挡密码。</p></section>
+  </main>
+  <footer><p>参考：<a href="https://emby.media/support/" target="_blank" rel="noopener noreferrer">Emby 官方文档</a> · <a href="https://firecore.com/infuse" target="_blank" rel="noopener noreferrer">Infuse 官网</a> · <a href="https://wiki.freeembyguide.eu.org/docs/guide/about.html" target="_blank" rel="noopener noreferrer">Emby 公益不完全指北</a></p><p>由 Gary4j 维护 · 非 Emby 官方网站 · <a href="https://github.com/Gary4j/embywiki" target="_blank" rel="noopener noreferrer">GitHub</a></p></footer>
+ </div>
 </template>

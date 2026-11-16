@@ -1,35 +1,37 @@
-# Emby Wiki
+# Emby 使用指南
 
-独立中文 Emby 使用指南。VitePress + Vue + Markdown，Cloudflare Pages 托管。
+一个面向已收到账号的客户的中文长页面：Emby 简介、客户端推荐、Emby / Infuse 配置步骤及真实界面截图。
 
-- 正式域名：https://embywiki.gary4j.top
-- Pages 域名：https://embywiki-gary4j.pages.dev
-- 资料来源与内容边界：`docs/about.md`
+- 正式地址：https://embywiki.gary4j.top
+- Cloudflare Pages：https://embywiki-gary4j.pages.dev
+- 仓库：https://github.com/Gary4j/embywiki
 
-## 本地开发
+## 交付信息
 
-需要 Node.js 22 或更高版本。
+客户可以粘贴“观影地址、续费地址、账号、密码、到期”格式的文本，页面本地解析协议、主机和端口，生成各客户端填写表。原文在解析成功后清空；不发送网络请求，不写浏览器存储，也不把凭据拼入链接。离开页面时清空内存中的表单数据。密码默认隐藏。
+
+请不要在源码、Issue、URL 或截图中放真实客户凭据。截图来源见 `docs/public/screenshots/NOTICE.md`。
+
+## 开发和发布
+
+Node.js 22 或以上。
 
 ```sh
 npm ci
+npm test
 npm run dev
 npm run build
-npm run preview
 ```
 
-文档位于 `docs/`，导航配置在 `docs/.vitepress/config.mts`，首页与视觉样式位于 `docs/.vitepress/theme/`。搜索由 VitePress 本地索引生成，无需第三方搜索服务。
+Cloudflare Pages 连接 `main` 分支，构建命令 `npm run build`，输出 `docs/.vitepress/dist`。提交后自动部署。
 
-## Cloudflare Pages
+- 页面：`docs/.vitepress/theme/Home.vue`
+- 解析逻辑：`docs/.vitepress/theme/delivery.mjs`
+- 样式：`docs/.vitepress/theme/style.css`
+- 旧版长文与主题保留在 `archive/`，不参与站点构建；旧页面地址通过 `_redirects` 跳转到首页对应章节。
 
-连接 GitHub 仓库 `Gary4j/embywiki`，生产分支 `main`。
+代码 MIT；原创内容 CC BY 4.0；第三方截图与商标不在上述许可范围内。
 
-- 构建命令：`npm run build`
-- 输出目录：`docs/.vitepress/dist`
-- Node.js：22（项目 `.node-version`）
-- 在 Pages 自定义域页面绑定 `embywiki.gary4j.top`，由 Cloudflare 建立指向 `embywiki-gary4j.pages.dev` 的 CNAME 与 HTTPS。
+## 当前截图
 
-内容更新提交到 main 后由 Pages 自动构建。不要提交账号、密码、访问令牌或私人服务器信息。
-
-## 许可
-
-代码：MIT，见 LICENSE。原创文档：CC BY 4.0，见 CONTENT-LICENSE.md。外部引用与商标遵循原权利人的条款。
+Emby 使用官方 Web 26.0.43 的实截连接页；Infuse 使用官方当前教程配图（文章更新 2026-11-10）。详细来源见 docs/public/screenshots/NOTICE.md。旧社区截图仅归档，不部署。
