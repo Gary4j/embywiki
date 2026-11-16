@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://embywiki.gary4j.top/sitemap.xml
