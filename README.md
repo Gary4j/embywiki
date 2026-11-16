@@ -1,6 +1,6 @@
 # Emby 使用指南
 
-一个面向已收到账号的客户的中文长页面：Emby 简介、客户端推荐、Emby / Infuse 配置步骤及真实界面截图。
+一个面向已收到账号的客户的中文长页面：Emby 简介、客户端推荐、Emby / Infuse / VidHub 配置步骤及真实界面截图。
 
 - 正式地址：https://embywiki.gary4j.top
 - Cloudflare Pages：https://embywiki-gary4j.pages.dev
