@@ -10,7 +10,7 @@
 
 客户可以粘贴“观影地址、续费地址、账号、密码、到期”格式的文本，页面本地解析协议、主机和端口，生成各客户端填写表。原文在解析成功后清空；不发送网络请求，不写浏览器存储，也不把凭据拼入链接。离开页面时清空内存中的表单数据。密码默认隐藏。
 
-请不要在源码、Issue、URL 或截图中放真实客户凭据。截图来源见 `docs/public/screenshots/NOTICE.md`。
+请不要在源码、Issue、URL 或截图中放真实客户凭据。外部图片来源记录保存在 `archive/external-screenshots/NOTICE.md`，不参与部署。
 
 ## 开发和发布
 
@@ -34,4 +34,8 @@ Cloudflare Pages 连接 `main` 分支，构建命令 `npm run build`，输出 `d
 
 ## 当前截图
 
-Emby 使用官方 Web 26.0.43 的实截连接页；Infuse 使用官方当前教程配图（文章更新 2026-11-10）。详细来源见 docs/public/screenshots/NOTICE.md。旧社区截图仅归档，不部署。
+页面仅保留本站实际截取的 Emby Web 26.0.43 配置图。Infuse 与 VidHub 的外部教程截图已迁入 archive/external-screenshots，不参与部署。
+
+## 服务要求
+
+明确禁止使用媒体库模式（Library Mode）；Infuse 必须使用直接模式（Direct Mode）。
