@@ -31,7 +31,7 @@ VPN、代理或网络加速工具会改变路径，也可能导致绕路。是�
 
 只使用管理员确认的新地址，保留协议和端口。CNAME 是域名映射，无法替代服务器端域名绑定和 HTTPS 配置。
 
-本站的 `embywiki.pages.dev` 与 `embywiki.gary4j.top` 仅用于文档托管，不是 Emby 播放服务器地址。
+本站的 `embywiki-gary4j.pages.dev` 与 `embywiki.gary4j.top` 仅用于文档托管，不是 Emby 播放服务器地址。
 
 ## 参考资料
 
